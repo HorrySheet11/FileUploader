@@ -14,7 +14,7 @@ userRouter.post(
 		failureRedirect: "/log-in",
 	}),
 );
-userRouter.get("sign-up", signUpGet);
-userRouter.post("sign-up", signUpPost);
+userRouter.get("/sign-up", signUpGet);
+userRouter.post("/sign-up", signUpPost);
 
 export default userRouter;

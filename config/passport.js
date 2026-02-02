@@ -20,13 +20,12 @@ passport.use(
         //   "SELECT * FROM members WHERE firstname = $1 and lastname = $2 and email = $3",
         //   [userName, username],
         // );
-         
         const user = await prisma.user.findUnique({
           where:{
             username: userName,
             email: username
           }
-        })
+        });
         req.session.messages = [];
         if (!user) {
           return done(null, false, { message: "Incorrect first, last name or email" });
@@ -47,16 +46,20 @@ passport.use(
 // passport.use(new AnonymousStrategy());
 
 passport.serializeUser((user, done) => {
-  done(null, user.member_id);
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM members WHERE member_id = $1",
-      [id],
-    );
-    const user = rows[0];
+    // const { rows } = await pool.query(
+    //   "SELECT * FROM members WHERE member_id = $1",
+    //   [id],
+    // );
+    const user = await prisma.user.findUnique({
+          where:{
+            id,
+          }
+        });
     done(null, user);
   } catch (err) {
     done(err);

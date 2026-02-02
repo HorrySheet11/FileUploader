@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import {prisma} from "../lib/prisma.js";
 
 export function home(req, res) {
 	res.render("index", {
@@ -11,15 +12,22 @@ export function loginGet(req, res) {
 }
 
 export function signUpGet(req, res) {
-	res.render("sign-up-form");
+	res.render("sign-up");
 }
 
-export async function signUpPost(req, res) {
+export async function signUpPost(req, res, next) {
 	try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 		//USE PRISMA
 		// console.log(req.body);
-		await query.signUp(req.body.username, req.body.email, hashedPassword);
+		// await query.signUp(req.body.username, req.body.email, hashedPassword);
+    await prisma.user.create({
+      data: {
+        name: req.body.username,
+        email: req.body.email,
+        password: hashedPassword
+      }
+    })
 		res.redirect("/log-in");
 	} catch (error) {
 		console.error(error);
