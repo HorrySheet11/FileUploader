@@ -8,8 +8,16 @@
 <body>
   <h1>Horry Uploader</h1>
   <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <button type="submit">Upload</button>
+    <input type="file" name="file" id="file"><br><br>
+    <button type="submit" id="upload" >Upload</button>
   </form>
 </body>
+  <script>
+      const fileInput = document.getElementById('file');
+      const uploadBtn = document.getElementById('upload');
+  
+      fileInput.addEventListener('change', function () {
+        fileInput.files.length === 1 ? uploadBtn.disabled = false : uploadBtn.disabled = true;
+      });
+  </script>
 </html>

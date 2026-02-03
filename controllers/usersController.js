@@ -35,3 +35,21 @@ export async function signUpPost(req, res, next) {
 	}
 }
 
+export async function upload(req,res){
+  await prisma.files.create({
+    data: {
+      name: req.file.filename,
+      file: req.file,
+      user: {
+        connect: {
+          id: req.user.id
+        }
+      }
+    }
+  })
+}
+
+export async function tempUpload(req,res){
+  console.log(`filename: ${req.file.filename}`);
+  res.redirect('/')
+}

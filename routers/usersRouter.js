@@ -1,7 +1,8 @@
 import { Router } from "express";
 import passport from "passport";
-import {home, loginGet, signUpGet, signUpPost} from "../controllers/usersController.js";
+import {home, loginGet, signUpGet, signUpPost, upload, tempUpload} from "../controllers/usersController.js";
 import { isAuth } from "./authenticator.js";
+import { fileUpload } from "../config/multer.js";
 
 const userRouter = Router();
 
@@ -16,5 +17,8 @@ userRouter.post(
 );
 userRouter.get("/sign-up", signUpGet);
 userRouter.post("/sign-up", signUpPost);
+userRouter.post('/upload', fileUpload.single('file'), tempUpload
+// upload
+)
 
 export default userRouter;
