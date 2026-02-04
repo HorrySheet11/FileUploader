@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= folder.name %></title>
+  <title><%= folder.folderName %></title>
 </head>
 <body>
-  <h1><%= folder.name %></h1>
+  <h1><%= folder.folderName %></h1>
   <form action="/upload/<%= folder.id %>" method="post" enctype="multipart/form-data">
     <input type="file" name="file" id="file"><br><br>
     <button type="submit" id="upload" >Upload</button>

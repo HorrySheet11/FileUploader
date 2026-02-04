@@ -86,18 +86,25 @@ export async function inspectFile(req, res) {
 		},
 	});
 	res.render("inspectFile", {
-		file: file,
+		files: file,
 	});
 }
 
 export async function inspectFolder(req, res) {
 	const folder = await prisma.folder.findUnique({
 		where: {
-			id: req.params.folderId,
+			id: parseInt(req.params.folderId),
 		},
+		select: {
+			folderName: true,
+			id: true,
+			file: true,
+		}
 	});
+	console.log(folder);
 	res.render("inspectFolder", {
-		folder: folder,
+		files: folder.file,
+		folder: folder
 	});
 }
 
