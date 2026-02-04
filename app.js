@@ -29,17 +29,17 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-// app.use((req, res, next) => {
-//   res.locals.error_msg = req.flash('error');
-//   res.locals.success_msg = req.flash('success');
-//   next();
-// });
+
 app.use(express.urlencoded({ extended: false }));
-// app.use((req, res, next) => {
-// 	console.log(req.session);
-// 	console.log(req.user);
-// 	next();
-// });
+app.use((req, res, next) => {
+	console.log(req.session);
+	console.log(req.user);
+	next();
+});
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 app.use("/", routes);
 const port = process.env.PORT || 3000;
 app.listen(port, (error) => {

@@ -1,24 +1,32 @@
 import { Router } from "express";
 import passport from "passport";
-import {home, loginGet, signUpGet, signUpPost, upload, tempUpload} from "../controllers/usersController.js";
-import { isAuth } from "./authenticator.js";
 import { fileUpload } from "../config/multer.js";
+import * as userController from "../controllers/usersController.js";
+import { isAuth,authEmail } from "./authenticator.js";
 
 const userRouter = Router();
 
-userRouter.get("/", isAuth, home);
-userRouter.get("/log-in", loginGet);
+userRouter.get("/", isAuth, userController.home);
+userRouter.get("/logIn", userController.loginGet);
 userRouter.post(
-	"/log-in",
+	"/logIn",
 	passport.authenticate("local", {
 		successRedirect: "/",
-		failureRedirect: "/log-in",
+		failureRedirect: "/logIn",
 	}),
 );
-userRouter.get("/sign-up", signUpGet);
-userRouter.post("/sign-up", signUpPost);
-userRouter.post('/upload', fileUpload.single('file'), tempUpload
-// upload
-)
+userRouter.get("/logOut", userController.logout);
+userRouter.get("/sign-up", userController.signUpGet);
+userRouter.post("/sign-up", authEmail, userController.signUpPost);
+userRouter.post(
+	"/upload",
+	fileUpload.single("file"),
+	userController.tempUpload,
+	// upload
+);
+userRouter.get("/file/:fileId", userController.inspectFile);
+userRouter.get("/download/:fileId", userController.downloadFile);
+userRouter.get("/folder/:folderId", userController.inspectFolder);
+userRouter.post("/createFolder", userController.createFolder);
 
 export default userRouter;

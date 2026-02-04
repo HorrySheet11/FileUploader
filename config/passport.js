@@ -13,19 +13,15 @@ passport.use(
       passReqToCallback: true,
     },
     async (req, username, password, done) => {
-      const userName = req.body.username;       
+      const userName = req.body.name;       
       try {
-
-        // const { rows } = await pool.query(
-        //   "SELECT * FROM members WHERE firstname = $1 and lastname = $2 and email = $3",
-        //   [userName, username],
-        // );
         const user = await prisma.user.findUnique({
           where:{
-            username: userName,
+            name: userName,
             email: username
           }
         });
+        console.log(`User: ${user}`);
         req.session.messages = [];
         if (!user) {
           return done(null, false, { message: "Incorrect first, last name or email" });
@@ -51,10 +47,6 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    // const { rows } = await pool.query(
-    //   "SELECT * FROM members WHERE member_id = $1",
-    //   [id],
-    // );
     const user = await prisma.user.findUnique({
           where:{
             id,

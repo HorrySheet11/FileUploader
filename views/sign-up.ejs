@@ -7,6 +7,9 @@
 </head>
 <body>
   <h1>User Sign-up</h1>
+  <% if (message) { %>
+    <h2 style="color: red; font-weight: bolder;"><%= message %></h2>
+  <% } %>
   <form action="/sign-up" method="post">
     <label for="username">Username: <input type="text" name="username" id="username"></label><br>
     <label for="email">Email: <input type="text" name="email" id="email"></label><br>

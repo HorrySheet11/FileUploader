@@ -7,10 +7,35 @@
 </head>
 <body>
   <h1>Horry Uploader</h1>
+  <h2>Welcome <%= locals.user.name%></h2>
+  <a href="/logout"><button type="button">Logout</button></a>
   <form action="/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="file" id="file"><br><br>
     <button type="submit" id="upload" >Upload</button>
   </form>
+  <button id="createFolder">Create Folder</button>
+  <dialog id='folderDialog'>
+    <h2>Create Folder</h2>
+    <form action='/createFolder' method="post">
+      <label for="folderName">Name: <br>
+        <input type="text" name="folderName" id="folderName">
+      </label>
+      <button type="submit" id="closeDialog">Create</button>
+    </form>
+  </dialog>
+  <h2>Folders</h2>
+  <ul>
+    <% folders.forEach(folder => { %>
+      <li><a href="/folder/<%= folder.id %>"><%= folder.folderName %></a></li>
+    <% }) %>
+  </ul>
+
+  <h2>All Files</h2>
+  <ul>
+    <% files.forEach(file => { %>
+      <li><a href="/file/<%= file.id %>"><%= file.name %></a></li>
+    <% }) %>
+  </ul>
 </body>
   <script>
       const fileInput = document.getElementById('file');
@@ -19,5 +44,18 @@
       fileInput.addEventListener('change', function () {
         fileInput.files.length === 1 ? uploadBtn.disabled = false : uploadBtn.disabled = true;
       });
+
+      const createFolder = document.getElementById('createFolder');
+      const folderDialog = document.getElementById('folderDialog');
+      const closeDialog = document.getElementById('closeDialog');
+
+      createFolder.addEventListener('click', () => {
+        folderDialog.showModal();
+      });
+      closeDialog.addEventListener('click', () => {
+        folderDialog.close();
+      });
+
+      
   </script>
 </html>
