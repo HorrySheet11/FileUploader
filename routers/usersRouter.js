@@ -24,9 +24,12 @@ userRouter.post(
 	userController.tempUpload,
 	// upload
 );
+userRouter.post('/upload/folder/:folderId', fileUpload.single('file'), userController.uploadFileInFolder)
 userRouter.get("/file/:fileId", userController.inspectFile);
 userRouter.get("/download/:fileId", userController.downloadFile);
 userRouter.get("/folder/:folderId", userController.inspectFolder);
 userRouter.post("/createFolder", userController.createFolder);
+userRouter.post("/renameFolder/:folderId", userController.renameFolder);
+userRouter.post("/deleteFolder/:folderId", userController.deleteFolder);
 
 export default userRouter;

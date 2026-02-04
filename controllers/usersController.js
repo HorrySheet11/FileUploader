@@ -74,6 +74,25 @@ export async function upload(req, res) {
 	});
 }
 
+export async function uploadFileInFolder(req, res) {
+	await prisma.files.create({
+		data: {
+			name: req.file.filename,
+			file: req.file,
+			user: {
+				connect: {
+					id: req.user.id,
+				},
+			},
+			folder: {
+				connect: {
+					id: parseInt(req.params.folderId),
+				},
+			},
+		},
+	});
+}
+
 export async function tempUpload(req, res) {
 	console.log(`filename: ${req.file.filename}`);
 	res.redirect("/");
@@ -101,7 +120,6 @@ export async function inspectFolder(req, res) {
 			file: true,
 		}
 	});
-	console.log(folder);
 	res.render("inspectFolder", {
 		files: folder.file,
 		folder: folder
@@ -119,6 +137,27 @@ export async function createFolder(req, res) {
 					id: res.locals.currentUser.id,
 				},
 			},
+		},
+	});
+	res.redirect("/");
+}
+
+export async function renameFolder(req,res){
+	await prisma.folder.update({
+		where: {
+			id: parseInt(req.params.folderId),
+		},
+		data: {
+			folderName: req.body.folderName,
+		},
+	});
+	res.redirect(`/folder/${req.params.folderId}`);
+}
+
+export async function deleteFolder(req,res){
+	await prisma.folder.delete({
+		where: {
+			id: parseInt(req.params.folderId),
 		},
 	});
 	res.redirect("/");
