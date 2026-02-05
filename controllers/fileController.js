@@ -30,17 +30,14 @@ export async function upload(req, res) {
 	//add to supabase bucket db
 	const { data, error } = await supabase.storage
 		.from("fileUploaderStorage")
-		.upload(`storage/${file.originalName}`, file.originalName, {
-			cacheControl: "3600",
-			upsert: false,
-		});
-
+		.upload(`storage/${file.originalName}`, file.buffer, {upsert: false});
+  data ? console.log(data) : console.log(error);
 	//add to db
 	const newFile = await prisma.files.create({
 		data: {
 			fileName: file.originalname,
 			fileSize: file.size,
-			filePath: `storage/${file.originalName}`,
+			filePath: `storage/${file.originalname}`,
 			mimeType: file.mimetype,
 			user: {
 				connect: {
