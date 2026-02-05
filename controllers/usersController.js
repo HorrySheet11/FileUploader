@@ -43,9 +43,6 @@ export function signUpGet(req, res) {
 export async function signUpPost(req, res, next) {
 	try {
 		const hashedPassword = await bcrypt.hash(req.body.password, 10);
-		//USE PRISMA
-		// console.log(req.body);
-		// await query.signUp(req.body.username, req.body.email, hashedPassword);
 		await prisma.user.create({
 			data: {
 				name: req.body.username,
@@ -60,105 +57,12 @@ export async function signUpPost(req, res, next) {
 	}
 }
 
-export async function upload(req, res) {
-	await prisma.files.create({
-		data: {
-			name: req.file.filename,
-			file: req.file,
-			user: {
-				connect: {
-					id: req.user.id,
-				},
-			},
-		},
-	});
-}
 
-export async function uploadFileInFolder(req, res) {
-	await prisma.files.create({
-		data: {
-			name: req.file.filename,
-			file: req.file,
-			user: {
-				connect: {
-					id: req.user.id,
-				},
-			},
-			folder: {
-				connect: {
-					id: parseInt(req.params.folderId),
-				},
-			},
-		},
-	});
-}
 
-export async function tempUpload(req, res) {
-	console.log(`filename: ${req.file.filename}`);
-	res.redirect("/");
-}
 
-export async function inspectFile(req, res) {
-	const file = await prisma.files.findUnique({
-		where: {
-			id: req.params.fileId,
-		},
-	});
-	res.render("inspectFile", {
-		files: file,
-	});
-}
 
-export async function inspectFolder(req, res) {
-	const folder = await prisma.folder.findUnique({
-		where: {
-			id: parseInt(req.params.folderId),
-		},
-		select: {
-			folderName: true,
-			id: true,
-			file: true,
-		}
-	});
-	res.render("inspectFolder", {
-		files: folder.file,
-		folder: folder
-	});
-}
 
-export async function downloadFile(req, res) {}
 
-export async function createFolder(req, res) {
-	await prisma.folder.create({
-		data: {
-			folderName: req.body.folderName,
-			user: {
-				connect: {
-					id: res.locals.currentUser.id,
-				},
-			},
-		},
-	});
-	res.redirect("/");
-}
 
-export async function renameFolder(req,res){
-	await prisma.folder.update({
-		where: {
-			id: parseInt(req.params.folderId),
-		},
-		data: {
-			folderName: req.body.folderName,
-		},
-	});
-	res.redirect(`/folder/${req.params.folderId}`);
-}
 
-export async function deleteFolder(req,res){
-	await prisma.folder.delete({
-		where: {
-			id: parseInt(req.params.folderId),
-		},
-	});
-	res.redirect("/");
-}
+

@@ -25,16 +25,15 @@ model User {
 model Files {
   id           Int      @id @default(autoincrement())
   fileName     String
-  file         Bytes
-  dateUploaded DateTime @default(now())
-  fileSize     Int
-  fileType     String
+  fileSize     BigInt
   filePath     String
+  mimeType     String
+  dateUploaded DateTime @default(now())
 
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int    @unique
-  folder Folder? @relation(fields: [folderId], references: [id])
-  folderId  Int
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int    @unique
+  folder    Folder? @relation(fields: [folderId], references: [id]) 
+  folderId  Int? 
 }
 
 model Folder{
