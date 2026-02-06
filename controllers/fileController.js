@@ -20,60 +20,63 @@ export async function downloadFile(req, res) {
 }
 
 export async function upload(req, res) {
-	// try {
-	const file = req.file;
-	console.log(file);
-	if (!file) {
-		res.status(400).json({ message: "Please upload a file" });
-		return;
-	}
-	//add to supabase bucket db
-	const { data, error } = await supabase.storage
-		.from("fileUploaderStorage")
-		.upload(`storage/${file.originalName}`, file.buffer, {upsert: false});
-  data ? console.log(data) : console.log(error);
-	//add to db
-	const newFile = await prisma.files.create({
-		data: {
-			fileName: file.originalname,
-			fileSize: file.size,
-			filePath: `storage/${file.originalname}`,
-			mimeType: file.mimetype,
-			user: {
-				connect: {
-					id: req.user.id,
+	try {
+		const file = req.file;
+		console.log(file);
+		if (!file) {
+			res.status(400).json({ message: "Please upload a file" });
+			return;
+		}
+		const { data, error } = await supabase.storage
+			.from("fileUploaderStorage")
+			.upload(
+				`storage/userId${req.user.id}/${file.originalname}`,
+				file.buffer,
+				{ upsert: false },
+			);
+		const result = data ? data : error;
+		console.log(`result: ${result}`);
+		await prisma.files.create({
+			data: {
+				fileName: file.originalname,
+				fileSize: file.size,
+				filePath: `storage/userId${req.user.id}/${file.originalname}`,
+				mimeType: file.mimetype,
+				user: {
+					connect: {
+						id: req.user.id,
+					},
 				},
 			},
-		},
-	});
-  console.log(newFile)
-	// } catch (error) {
-	//   console.error(error);
-	//   res.status(500).json({ message: 'Error uploading file', error });
-	// }
-  res.redirect("/");
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Error uploading file", error });
+	}
+	res.redirect("/");
 }
 
 export async function uploadFileInFolder(req, res) {
 	try {
 		const file = req.file;
-
 		if (!file) {
 			res.status(400).json({ message: "Please upload a file" });
 			return;
 		}
-
 		const { data, error } = await supabase.storage
-			.from("File Uploader app")
-			.upload(`fileUploader/${file.originalName}`, file.originalName, {
-				cacheControl: "3600",
-				upsert: false,
-			});
+			.from("fileUploaderStorage")
+			.upload(
+				`storage/userId${req.user.id}/${file.originalname}`,
+				file.buffer,
+				{ upsert: false },
+			);
+		const result = data ? data : error;
+		console.log(`result: ${result}`);
 		await prisma.files.create({
 			data: {
-				fileName: file.originalName,
+				fileName: file.originalname,
 				fileSize: file.size,
-				filePath: file.path,
+				filePath: `storage/userId${req.user.id}/${file.originalname}`,
 				mimeType: file.mimetype,
 				user: {
 					connect: {
@@ -82,7 +85,7 @@ export async function uploadFileInFolder(req, res) {
 				},
 				folder: {
 					connect: {
-						id: parseInt(req.params.folderId),
+						id: parseInt(req.params.folderId, 10),
 					},
 				},
 			},
@@ -96,15 +99,16 @@ export async function uploadFileInFolder(req, res) {
 export async function inspectFile(req, res) {
 	const file = await prisma.files.findUnique({
 		where: {
-			id: req.params.fileId,
+			id: parseInt(req.params.fileId, 10)
 		},
+    include: {
+      folder: true,
+      user: true
+    }
 	});
+  console.log(file);
 	res.render("inspectFile", {
-		files: file,
+		file: file,
 	});
 }
 
-export async function tempUpload(req, res) {
-	console.log(`filename: ${req.file.filename}`);
-	res.redirect("/");
-}
