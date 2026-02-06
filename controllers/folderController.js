@@ -5,10 +5,8 @@ export async function inspectFolder(req, res) {
 		where: {
 			id: parseInt(req.params.folderId),
 		},
-		select: {
-			folderName: true,
-			id: true,
-			file: true,
+		include:{
+			file: true
 		}
 	});
 	res.render("inspectFolder", {

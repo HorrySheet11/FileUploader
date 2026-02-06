@@ -16,27 +16,38 @@ export async function downloadFile(req, res) {
 		console.log(result);
 	if (error) return res.status(500).send(error.message);
 
-  // Convert the Blob to a Node.js Buffer
     const buffer = Buffer.from(await data.arrayBuffer());
 
-    // Set the appropriate headers for the download
     res.set({
-      'Content-Type': fileRequest.mimeType, // e.g., 'image/jpeg', 'application/pdf'
+      'Content-Type': fileRequest.mimeType, 
       'Content-Disposition': `attachment; filename="${fileRequest.fileName}"`,
       'Content-Length': buffer.length,
     });
 
-    // Send the buffer as the response
     res.send(buffer);
 }
 
 export async function upload(req, res) {
 	try {
 		const file = req.file;
-		if (!file) {
-			res.status(400).json({ message: "Please upload a file" });
-			return;
-		}
+
+    if (!file) {
+      res.status(400).json({ message: "Please upload a file" });
+      return;
+    }
+    const isDuplicate = await prisma.files.findFirst({
+      where: {
+        fileName: file.originalname,
+        user: {
+          id: parseInt(req.user.id, 10),
+        },
+      },
+    });
+    if (isDuplicate) {
+      res.status(400).json({ message: "File already exists" });
+      return;
+    }
+
 		const { data, error } = await supabase.storage
 			.from("fileUploaderStorage")
 			.upload(
@@ -72,6 +83,18 @@ export async function uploadFileInFolder(req, res) {
 			res.status(400).json({ message: "Please upload a file" });
 			return;
 		}
+    const isDuplicate = await prisma.files.findFirst({
+      where: {
+        fileName: file.originalname,
+        user: {
+          id: parseInt(req.user.id, 10),
+        },
+      },
+    });
+    if (isDuplicate) {
+      res.status(400).json({ message: "File already exists" });
+      return;
+    }
 		const { data, error } = await supabase.storage
 			.from("fileUploaderStorage")
 			.upload(
@@ -88,7 +111,7 @@ export async function uploadFileInFolder(req, res) {
 				mimeType: file.mimetype,
 				user: {
 					connect: {
-						id: parseInt(req.user.id),
+						id: parseInt(req.user.id, 10),
 					},
 				},
 				folder: {
