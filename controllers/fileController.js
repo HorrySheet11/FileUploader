@@ -1,28 +1,38 @@
 import { supabase } from "../config/supabase.js";
 import { prisma } from "../lib/prisma.js";
+import fs from "fs";
 
 export async function downloadFile(req, res) {
 	const fileRequest = await prisma.files.findUnique({
 		where: {
-			id: req.params.fileId,
+			id: parseInt(req.params.fileId, 10),
 		},
 	});
 
-	const file = await supabase.storage
-		.from("File Uploader app")
+	const { data, error } = await supabase.storage
+		.from("fileUploaderStorage")
 		.download(fileRequest.filePath);
+  const result = data ? data : error;
+		console.log(result);
+	if (error) return res.status(500).send(error.message);
 
-	res.redirect(file.filePath, {
-		headers: {
-			"Content-Type": file.mimeType,
-		},
-	});
+  // Convert the Blob to a Node.js Buffer
+    const buffer = Buffer.from(await data.arrayBuffer());
+
+    // Set the appropriate headers for the download
+    res.set({
+      'Content-Type': fileRequest.mimeType, // e.g., 'image/jpeg', 'application/pdf'
+      'Content-Disposition': `attachment; filename="${fileRequest.fileName}"`,
+      'Content-Length': buffer.length,
+    });
+
+    // Send the buffer as the response
+    res.send(buffer);
 }
 
 export async function upload(req, res) {
 	try {
 		const file = req.file;
-		console.log(file);
 		if (!file) {
 			res.status(400).json({ message: "Please upload a file" });
 			return;
@@ -35,7 +45,6 @@ export async function upload(req, res) {
 				{ upsert: false },
 			);
 		const result = data ? data : error;
-		console.log(`result: ${result}`);
 		await prisma.files.create({
 			data: {
 				fileName: file.originalname,
@@ -71,7 +80,6 @@ export async function uploadFileInFolder(req, res) {
 				{ upsert: false },
 			);
 		const result = data ? data : error;
-		console.log(`result: ${result}`);
 		await prisma.files.create({
 			data: {
 				fileName: file.originalname,
@@ -80,7 +88,7 @@ export async function uploadFileInFolder(req, res) {
 				mimeType: file.mimetype,
 				user: {
 					connect: {
-						id: req.user.id,
+						id: parseInt(req.user.id),
 					},
 				},
 				folder: {

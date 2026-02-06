@@ -10,8 +10,8 @@
   <% if(file.folder){%> <h2>Folder: <%= file.folder.folderName%></h2> <%} %>
   <h2>Date uploaded: <%= file.dateUploaded%></h2>
   <h2>Uploaded by: <%= file.user.name %></h2>
-  <h2>File size: <%= file.fileSize%></h2>
+  <h2>File size: <%= file.fileSize%> bytes</h2>
   <a href="javascript:history.back()"><button>Go Back</button></a>
-  <a href="/downloadFile/<%= file.id %>" ><button>Download</button></a>
+  <a href="/download/<%= file.id %>" ><button>Download</button></a>
 </body>
 </html> 

@@ -21,7 +21,7 @@ passport.use(
             email: username
           }
         });
-        console.log(`User: ${user}`);
+        // console.log(`User: ${user}`);
         req.session.messages = [];
         if (!user) {
           return done(null, false, { message: "Incorrect first, last name or email" });
